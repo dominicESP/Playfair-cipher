@@ -43,14 +43,14 @@ A C++ implementation of the classical Playfair cipher with encryption, decryptio
 ## Example
 
 ## Encryption
-Plaintext: hello world
-Encryption key: pizza
-Encrypted message: PF1|JFKYMQVQSKK4|3,11
+- Plaintext: hello world
+- Encryption key: pizza
+- Encrypted message: PF1|JFKYMQVQSKK4|3,11
 
 ## Decryption
-Encrypted text: PF1|JFKYMQVQSKK4|3,11
-Encryption key: pizza
-Original text: HELLOWORLD
+- Encrypted text: PF1|JFKYMQVQSKK4|3,11
+- Encryption key: pizza
+- Original text: HELLOWORLD
 
 ---
 
