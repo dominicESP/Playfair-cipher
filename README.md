@@ -48,7 +48,9 @@ A C++ implementation of the classical Playfair cipher with encryption, decryptio
 - Encrypted message: PF1|JFKYMQVQSKK4|3,11
 
   PF1 = Serialization version
+
   JFKYMQVQSKK4 = Encrypted text
+  
   3,11 = Padding positions
 
 ## Decryption
