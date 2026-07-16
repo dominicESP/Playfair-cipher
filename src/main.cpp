@@ -1,11 +1,7 @@
 #include <iostream>
-//#include "caesar.h"
-//#include "vigenere.h"
 #include "playfair.h"
 
 int main() {
-	//Caesar caesar;
-	//Vigenere vigenere;
 	Playfair playfair;
 
 	int choice;
