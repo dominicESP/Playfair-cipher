@@ -96,4 +96,4 @@ During the development of this project I practiced:
 
 ## Author
 
-Created by Dominic.
+Created by Dominic (2026).
