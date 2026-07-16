@@ -1,0 +1,22 @@
+# Visual Studio
+.vs/
+x64/
+Debug/
+Release/
+
+# Archivos compilados
+*.obj
+*.pdb
+*.ilk
+*.log
+*.tlog
+*.ipch
+*.idb
+
+# Archivos de usuario
+*.user
+*.VC.db
+*.VC.opendb
+
+# Caché
+*.cache
