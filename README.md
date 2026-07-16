@@ -47,6 +47,10 @@ A C++ implementation of the classical Playfair cipher with encryption, decryptio
 - Encryption key: pizza
 - Encrypted message: PF1|JFKYMQVQSKK4|3,11
 
+- PF1 = Serialization version
+- JFKYMQVQSKK4 = Encrypted text
+- 3,11 = Padding positions
+
 ## Decryption
 - Encrypted text: PF1|JFKYMQVQSKK4|3,11
 - Encryption key: pizza
@@ -81,6 +85,10 @@ During the development of this project I practiced:
 - Input validation.
 - Iterators (`rbegin`, `rend`).
 - File and project organization.
+- Exception handling.
+- Advanced use of STL containers (`std::vector`, `std::string`).
+- Defensive input validation.
+- Designing and implementing a custom serialization format.
 
 ---
 
