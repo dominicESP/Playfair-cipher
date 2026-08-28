@@ -11,7 +11,7 @@ int main() {
 	std::string key;
 
 	while (loop == "n") {
-		std::cout << "Do you want to encrypt or decrypt? [1/2]: ";
+        std::cout << "Do you want to encrypt or decrypt? [1/2]: ";
 
         try {
             if (!(std::cin >> choice))
@@ -32,10 +32,8 @@ int main() {
             switch (choice)
             {
             case 1:
-                std::cout << "Write your text to encrypt: ";
+                std::cout << "\nWrite your text to encrypt: ";
                 std::getline(std::cin, encryptText);
-
-                std::cout << std::endl;
 
                 std::cout << "\nWrite your key: ";
                 std::getline(std::cin, key);
@@ -44,10 +42,8 @@ int main() {
                 break;
 
             case 2:
-                std::cout << "Write your text to decrypt: ";
+                std::cout << "\nWrite your text to decrypt: ";
                 std::getline(std::cin, decryptText);
-
-				std::cout << std::endl;
 
                 std::cout << "\nWrite your key: ";
                 std::getline(std::cin, key);
