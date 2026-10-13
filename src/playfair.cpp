@@ -17,14 +17,14 @@ void Playfair::generateMatrix(const std::string& key) {
 	for (size_t i = 0; i < upperKey.length(); i++) {
 		auto it = std::find(updatedKey.begin(), updatedKey.end(), upperKey[i]);
 
-		if (it == updatedKey.end()) {
-			updatedKey.push_back(upperKey[i]);
+		if (it == updatedKey.end()) { // if the letter is not found in the updatedKey, add it
+			updatedKey.push_back(upperKey[i]); //changes the key if the letters are repeated. hello -> helo
 		}
 	}
 
 	for (const auto& letter : alphabet) {
 		if (std::find(updatedKey.begin(), updatedKey.end(), letter) == updatedKey.end()) {
-			updatedKey.push_back(letter);
+			updatedKey.push_back(letter); // generates a new alphabet with the key letters first and then the rest of the alphabet
 		}
 	}
 
@@ -44,10 +44,17 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	std::string pair;
 
 	size_t i = 0;
-
-	for (char c : text) {
+	Playfair::spacesPositions.clear();
+	for (size_t i = 0; i < text.length(); ++i) {
+		char c = text[i];
 		if (std::isalnum(static_cast<unsigned char>(c))) {
 			cleanText.push_back(c);
+		}
+		else if (std::isspace(static_cast<unsigned char>(c))) {
+			Playfair::spacesPositions.push_back(i);
+		}
+		else if (!std::isalnum(static_cast<unsigned char>(c)) && !std::isdigit(static_cast<unsigned char>(c))) {
+			throw std::invalid_argument("The text contains invalid characters. Only letters, digits and spaces are allowed.");
 		}
 	}
 
@@ -58,7 +65,7 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	std::transform(cleanText.begin(), cleanText.end(), cleanText.begin(), std::toupper);
 
 	while (i < cleanText.length()) {
-		size_t xPosition = preparedText.pairs.size() * 2 + 1;
+		size_t xPosition = preparedText.pairs.size() * 2 + 1; // calculates the position of the 'X' at the end of the pair, which is always at an odd index
 		if (i == cleanText.length() - 1) {
 			pair.push_back(cleanText[i]);
 			pair.push_back('X');
@@ -313,3 +320,13 @@ std::string Playfair::decrypt(const std::string& message, const std::string& key
 
 	return decryptedText;
 }
+
+
+/*
+QUE HACER LA SIGUIENTE VEZ QUE ENTRES
+
+1. añadir los espacios al texto cifrado
+2. añadir los espacios al texto descifrado para devolver el texto original con espacios incluidos
+3. cuando funcione, lo mismo para los signos de puntuación
+4. poner comentarios a las funciones para acordarme mas rapido de lo que hace cada una
+*/

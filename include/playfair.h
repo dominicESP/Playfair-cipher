@@ -25,6 +25,8 @@ private:
 
 	char matrix[6][6];
 	
+	std::vector<int> spacesPositions;
+
 	void generateMatrix(const std::string& key);
 
 	PreparedText prepareText(const std::string& text);
