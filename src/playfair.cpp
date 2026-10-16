@@ -7,30 +7,30 @@
 #include <algorithm>
 
 void Playfair::generateMatrix(const std::string& key) {
-	std::string updatedKey;
+	std::string updatedAlphabet;
 	std::string upperKey = key;
-	std::string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	std::string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789¡!\",.;:¿?'%# ";
 	int letterIndex = 0;
 
 	std::transform(upperKey.begin(), upperKey.end(), upperKey.begin(), std::toupper);
 
 	for (size_t i = 0; i < upperKey.length(); i++) {
-		auto it = std::find(updatedKey.begin(), updatedKey.end(), upperKey[i]);
+		auto it = std::find(updatedAlphabet.begin(), updatedAlphabet.end(), upperKey[i]);
 
-		if (it == updatedKey.end()) { // if the letter is not found in the updatedKey, add it
-			updatedKey.push_back(upperKey[i]); //changes the key if the letters are repeated. hello -> helo
+		if (it == updatedAlphabet.end()) { // if the letter is not found in the updatedAlphabet, add it
+			updatedAlphabet.push_back(upperKey[i]); // changes the key if the letters are repeated. hello -> helo
 		}
 	}
 
 	for (const auto& letter : alphabet) {
-		if (std::find(updatedKey.begin(), updatedKey.end(), letter) == updatedKey.end()) {
-			updatedKey.push_back(letter); // generates a new alphabet with the key letters first and then the rest of the alphabet
+		if (std::find(updatedAlphabet.begin(), updatedAlphabet.end(), letter) == updatedAlphabet.end()) {
+			updatedAlphabet.push_back(letter); // generates a new alphabet with the key letters first and then the rest of the alphabet
 		}
 	}
 
 	for (size_t row = 0; row < MATRIX_SIZE; row++) {
 		for (size_t column = 0; column < MATRIX_SIZE; column++) {
-			matrix[row][column] = updatedKey[letterIndex];
+			matrix[row][column] = updatedAlphabet[letterIndex];
 			letterIndex++;
 		}
 	}
@@ -43,19 +43,13 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	std::string cleanText;
 	std::string pair;
 
-	size_t i = 0;
-	Playfair::spacesPositions.clear();
-	for (size_t i = 0; i < text.length(); ++i) {
+	size_t i = 0; // for while condition
+	for (size_t i = 0; i < text.length(); ++i) { // verify valid characters
 		char c = text[i];
-		if (std::isalnum(static_cast<unsigned char>(c))) {
+		if (std::isalnum(static_cast<unsigned char>(c)) || std::isspace(static_cast<unsigned char>(c))) {
 			cleanText.push_back(c);
 		}
-		else if (std::isspace(static_cast<unsigned char>(c))) {
-			Playfair::spacesPositions.push_back(i);
-		}
-		else if (!std::isalnum(static_cast<unsigned char>(c)) && !std::isdigit(static_cast<unsigned char>(c))) {
-			throw std::invalid_argument("The text contains invalid characters. Only letters, digits and spaces are allowed.");
-		}
+		// if condition to check whether c is a valid digit from the list or not
 	}
 
 	if (cleanText.empty()) {
@@ -114,7 +108,7 @@ Position Playfair::findPosition(char c) {
 std::string Playfair::serialize(const EncryptionResult& result) {
 	std::string format;
 
-	format += "PF1"; // PlayFair Version
+	format += "PF2"; // PlayFair Version
 	format.push_back('|'); // Separator
 	
 	format += result.text; // Add the encrypted text
@@ -143,7 +137,7 @@ EncryptionResult Playfair::deserialize(const std::string& inputText) {
 		throw std::invalid_argument("Invalid Playfair message format.");
 	}
 
-	if (inputText.substr(0, 4) != "PF1|") { //Checks the first 4 characters which are the first validation.
+	if (inputText.substr(0, 4) != "PF2|") { //Checks the first 4 characters which are the first validation.
 		throw std::invalid_argument("Invalid Playfair message format.");
 	}
 
@@ -222,8 +216,8 @@ std::string Playfair::encrypt(const std::string& text, const std::string& key) {
 	result.paddingPositions = preparedText.paddingPositions;
 
 	for (size_t i = 0; i < preparedText.pairs.size(); i++) {
-		Position firstPos = findPosition(preparedText.pairs[i][0]);
-		Position secondPos = findPosition(preparedText.pairs[i][1]);
+		Position firstPos = findPosition(preparedText.pairs[i][0]); // [H, E] * gets H [0]
+		Position secondPos = findPosition(preparedText.pairs[i][1]); // [H, E] * gets E [1]
 
 		if (firstPos.row == secondPos.row) {
 			firstPos.column = (firstPos.column + 1) % MATRIX_SIZE;

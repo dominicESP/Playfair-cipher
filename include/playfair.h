@@ -21,17 +21,15 @@ struct PreparedText {
 class Playfair {
 	
 private:
-	static constexpr int MATRIX_SIZE = 6;
+	static constexpr int MATRIX_SIZE = 7;
 
-	char matrix[6][6];
-	
-	std::vector<int> spacesPositions;
+	unsigned char matrix[7][7];
 
 	void generateMatrix(const std::string& key);
 
 	PreparedText prepareText(const std::string& text);
 
-	Position findPosition(char c);
+	Position findPosition(char c);	
 
 	std::string serialize(const EncryptionResult& result);
 
