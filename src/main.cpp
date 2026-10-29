@@ -1,7 +1,14 @@
+#define NOMINMAX
+
 #include <iostream>
+#include <Windows.h>
 #include "playfair.h"
 
+
 int main() {
+	SetConsoleOutputCP(CP_UTF8); // Set console output code page to UTF-8
+	SetConsoleCP(CP_UTF8); // Set console input code page to UTF-8
+
 	Playfair playfair;
 
 	int choice;

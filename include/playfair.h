@@ -23,7 +23,7 @@ class Playfair {
 private:
 	static constexpr int MATRIX_SIZE = 7;
 
-	unsigned char matrix[7][7];
+	std::string matrix[MATRIX_SIZE][MATRIX_SIZE];
 
 	void generateMatrix(const std::string& key);
 
@@ -34,6 +34,8 @@ private:
 	std::string serialize(const EncryptionResult& result);
 
 	EncryptionResult deserialize(const std::string& inputText);
+
+	const std::string symbolsList = "¡!\",.;:¿?'%# ";
 
 public:
 	std::string encrypt(const std::string& text, const std::string& key);

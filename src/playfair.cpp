@@ -1,6 +1,5 @@
 #include "playfair.h"
 #include <iostream>
-#include <string>
 #include <utility>
 #include <stdexcept>
 #include <cctype>
@@ -43,13 +42,15 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	std::string cleanText;
 	std::string pair;
 
-	size_t i = 0; // for while condition
 	for (size_t i = 0; i < text.length(); ++i) { // verify valid characters
-		char c = text[i];
-		if (std::isalnum(static_cast<unsigned char>(c)) || std::isspace(static_cast<unsigned char>(c))) {
-			cleanText.push_back(c);
+		auto it = std::find(symbolsList.begin(), symbolsList.end(), text[i]);
+
+		if (std::isalnum(static_cast<unsigned char>(text[i])) || std::isspace(static_cast<unsigned char>(text[i])) || it != symbolsList.end()) {
+			cleanText.push_back(text[i]);
 		}
-		// if condition to check whether c is a valid digit from the list or not
+		else {
+			throw std::invalid_argument("The text contains invalid characters.");
+		}
 	}
 
 	if (cleanText.empty()) {
@@ -57,7 +58,8 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	}
 
 	std::transform(cleanText.begin(), cleanText.end(), cleanText.begin(), std::toupper);
-
+	
+	size_t i = 0;
 	while (i < cleanText.length()) {
 		size_t xPosition = preparedText.pairs.size() * 2 + 1; // calculates the position of the 'X' at the end of the pair, which is always at an odd index
 		if (i == cleanText.length() - 1) {
@@ -96,7 +98,7 @@ Position Playfair::findPosition(char c) {
 
 	for (size_t row = 0; row < MATRIX_SIZE; row++) {
 		for (size_t column = 0; column < MATRIX_SIZE; column++) {
-			if (matrix[row][column] == c) {
+			if (matrix[row][column] == std::to_string(c)) {
 				return { static_cast<int>(row), static_cast<int>(column) };	
 			}
 		}
@@ -216,28 +218,28 @@ std::string Playfair::encrypt(const std::string& text, const std::string& key) {
 	result.paddingPositions = preparedText.paddingPositions;
 
 	for (size_t i = 0; i < preparedText.pairs.size(); i++) {
-		Position firstPos = findPosition(preparedText.pairs[i][0]); // [H, E] * gets H [0]
-		Position secondPos = findPosition(preparedText.pairs[i][1]); // [H, E] * gets E [1]
+		Position firstPos = findPosition(preparedText.pairs[i][0]); // [H, E] -> (pair) gets H [i, 0]
+		Position secondPos = findPosition(preparedText.pairs[i][1]); // [H, E] -> (pair) gets E [i, 1]
 
 		if (firstPos.row == secondPos.row) {
 			firstPos.column = (firstPos.column + 1) % MATRIX_SIZE;
 			secondPos.column = (secondPos.column + 1) % MATRIX_SIZE;
 			
-			result.text.push_back(matrix[firstPos.row][firstPos.column]);
-			result.text.push_back(matrix[secondPos.row][secondPos.column]);
+			result.text += matrix[firstPos.row][firstPos.column];
+			result.text += matrix[secondPos.row][secondPos.column];
 		}
 		else if (firstPos.column == secondPos.column) {
 			firstPos.row = (firstPos.row + 1) % MATRIX_SIZE;
 			secondPos.row = (secondPos.row + 1) % MATRIX_SIZE;
 
-			result.text.push_back(matrix[firstPos.row][firstPos.column]);
-			result.text.push_back(matrix[secondPos.row][secondPos.column]);
+			result.text += matrix[firstPos.row][firstPos.column];
+			result.text += matrix[secondPos.row][secondPos.column];
 		}
 		else {
 			std::swap(firstPos.column, secondPos.column);
 
-			result.text.push_back(matrix[firstPos.row][firstPos.column]);
-			result.text.push_back(matrix[secondPos.row][secondPos.column]);
+			result.text += matrix[firstPos.row][firstPos.column];
+			result.text += matrix[secondPos.row][secondPos.column];
 		}
 	}
 
@@ -260,7 +262,7 @@ std::string Playfair::decrypt(const std::string& message, const std::string& key
 		throw std::invalid_argument("The encrypted can't be empty.");
 	}
 
-	if (upperText.length() % 2 != 0) {
+	if (upperText.length() % 2 != 0) { // this is because the encrypted text consists of pairs of characters
 		throw std::invalid_argument("The encrypted text must have an even number of characters.");
 	}
 	
@@ -288,21 +290,21 @@ std::string Playfair::decrypt(const std::string& message, const std::string& key
 			firstPos.column = (firstPos.column + MATRIX_SIZE - 1) % MATRIX_SIZE; // adding MATRIX_SIZE - 1 is equivalent to subtracting 1 while avoiding negative index
 			secondPos.column = (secondPos.column + MATRIX_SIZE - 1) % MATRIX_SIZE;
 
-			decryptedText.push_back(matrix[firstPos.row][firstPos.column]);
-			decryptedText.push_back(matrix[secondPos.row][secondPos.column]);
+			decryptedText += matrix[firstPos.row][firstPos.column];
+			decryptedText += matrix[secondPos.row][secondPos.column];
 		}
 		else if (firstPos.column == secondPos.column) {
 			firstPos.row = (firstPos.row + MATRIX_SIZE - 1) % MATRIX_SIZE;
 			secondPos.row = (secondPos.row + MATRIX_SIZE - 1) % MATRIX_SIZE;
 
-			decryptedText.push_back(matrix[firstPos.row][firstPos.column]);
-			decryptedText.push_back(matrix[secondPos.row][secondPos.column]);
+			decryptedText += matrix[firstPos.row][firstPos.column];
+			decryptedText += matrix[secondPos.row][secondPos.column];
 		}
 		else {
 			std::swap(firstPos.column, secondPos.column);
 
-			decryptedText.push_back(matrix[firstPos.row][firstPos.column]);
-			decryptedText.push_back(matrix[secondPos.row][secondPos.column]);
+			decryptedText += matrix[firstPos.row][firstPos.column];
+			decryptedText += matrix[secondPos.row][secondPos.column];
 		}
 	}
 
@@ -323,4 +325,5 @@ QUE HACER LA SIGUIENTE VEZ QUE ENTRES
 2. añadir los espacios al texto descifrado para devolver el texto original con espacios incluidos
 3. cuando funcione, lo mismo para los signos de puntuación
 4. poner comentarios a las funciones para acordarme mas rapido de lo que hace cada una
+
 */
