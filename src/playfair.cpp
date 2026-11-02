@@ -5,13 +5,53 @@
 #include <cctype>
 #include <algorithm>
 
+std::size_t getBytes(const unsigned char charByte) {
+	int counterOf1 = 0;
+	for (size_t i = 7; i > 2; i--) {
+		int bit = (charByte >> i) & 1;
+
+		if (bit == 1) {
+			counterOf1++;
+		}
+		else if (bit == 0) {
+			break;
+		}
+	}
+
+	if (counterOf1 == 0) { // 0b0xxxxxxx (1 byte)
+
+	}
+	else if (counterOf1 == 2) { // 0b110xxxxx (2 bytes)
+
+	}
+	else if (counterOf1 == 3) { // 0b1110xxxx (3 bytes)
+
+	}
+	else if (counterOf1 == 4) { // 0b11110xxx (4 bytes)
+
+	}
+	else {
+		// throw
+	}
+}
+
 void Playfair::generateMatrix(const std::string& key) {
 	std::string updatedAlphabet;
-	std::string upperKey = key;
+	std::string upperKey;
 	std::string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789¡!\",.;:¿?'%# ";
 	int letterIndex = 0;
 
-	std::transform(upperKey.begin(), upperKey.end(), upperKey.begin(), std::toupper);
+	for (size_t i = 0; i < key.length(); ++i) {
+		std::string actualCharacter = key.substr(i, 1);
+
+		if (std::isalnum() && !std::isdigit()) { // FIX THIS WHEN THE FUNCTION TO GET THE CHAR'S BYTES IS COMPLETED
+			std::transform(actualCharacter.begin(), actualCharacter.end(), actualCharacter.begin(), std::toupper);
+			upperKey += actualCharacter;
+		}
+		else { // if actualCharater is a symbol
+			upperKey += actualCharacter;
+		}
+	}
 
 	for (size_t i = 0; i < upperKey.length(); i++) {
 		auto it = std::find(updatedAlphabet.begin(), updatedAlphabet.end(), upperKey[i]);
@@ -20,10 +60,10 @@ void Playfair::generateMatrix(const std::string& key) {
 			updatedAlphabet.push_back(upperKey[i]); // changes the key if the letters are repeated. hello -> helo
 		}
 	}
-
-	for (const auto& letter : alphabet) {
-		if (std::find(updatedAlphabet.begin(), updatedAlphabet.end(), letter) == updatedAlphabet.end()) {
-			updatedAlphabet.push_back(letter); // generates a new alphabet with the key letters first and then the rest of the alphabet
+	
+	for (size_t letter = 0; letter < alphabet.length(); ++letter) {
+		if (std::find(updatedAlphabet.begin(), updatedAlphabet.end(), alphabet[letter]) == updatedAlphabet.end()) {
+			updatedAlphabet += alphabet[letter]; // generates a new alphabet with the key letters first and then the rest of the alphabet
 		}
 	}
 
@@ -34,6 +74,7 @@ void Playfair::generateMatrix(const std::string& key) {
 		}
 	}
 
+	std::cout << updatedAlphabet << std::endl;
 }
 
 PreparedText Playfair::prepareText(const std::string& text) {
@@ -316,14 +357,3 @@ std::string Playfair::decrypt(const std::string& message, const std::string& key
 
 	return decryptedText;
 }
-
-
-/*
-QUE HACER LA SIGUIENTE VEZ QUE ENTRES
-
-1. añadir los espacios al texto cifrado
-2. añadir los espacios al texto descifrado para devolver el texto original con espacios incluidos
-3. cuando funcione, lo mismo para los signos de puntuación
-4. poner comentarios a las funciones para acordarme mas rapido de lo que hace cada una
-
-*/

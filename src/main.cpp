@@ -17,6 +17,8 @@ int main() {
 	std::string decryptText;
 	std::string key;
 
+    playfair.generateMatrix("chuchi");
+
 	while (loop == "n") {
         std::cout << "Do you want to encrypt or decrypt? [1/2]: ";
 

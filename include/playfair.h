@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <cstddef>
 
 struct Position {
 	int row;
@@ -20,7 +21,7 @@ struct PreparedText {
 
 class Playfair {
 	
-private:
+public:
 	static constexpr int MATRIX_SIZE = 7;
 
 	std::string matrix[MATRIX_SIZE][MATRIX_SIZE];
@@ -34,6 +35,8 @@ private:
 	std::string serialize(const EncryptionResult& result);
 
 	EncryptionResult deserialize(const std::string& inputText);
+
+	std::size_t getBytes(const unsigned char charByte);
 
 	const std::string symbolsList = "¡!\",.;:¿?'%# ";
 
