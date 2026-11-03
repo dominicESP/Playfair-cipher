@@ -5,7 +5,7 @@
 #include <cctype>
 #include <algorithm>
 
-std::size_t getBytes(const unsigned char charByte) {
+std::size_t Playfair::getBytes(const unsigned char charByte) {
 	int counterOf1 = 0;
 	for (size_t i = 7; i > 2; i--) {
 		int bit = (charByte >> i) & 1;
@@ -19,20 +19,22 @@ std::size_t getBytes(const unsigned char charByte) {
 	}
 
 	if (counterOf1 == 0) { // 0b0xxxxxxx (1 byte)
-
+		return 1;
 	}
 	else if (counterOf1 == 2) { // 0b110xxxxx (2 bytes)
-
+		return 2;
 	}
 	else if (counterOf1 == 3) { // 0b1110xxxx (3 bytes)
-
+		return 3;
 	}
 	else if (counterOf1 == 4) { // 0b11110xxx (4 bytes)
-
+		return 4;
 	}
 	else {
 		// throw
 	}
+
+	return 0;
 }
 
 void Playfair::generateMatrix(const std::string& key) {
@@ -42,15 +44,17 @@ void Playfair::generateMatrix(const std::string& key) {
 	int letterIndex = 0;
 
 	for (size_t i = 0; i < key.length(); ++i) {
-		std::string actualCharacter = key.substr(i, 1);
+		std::string actualCharacter = key.substr(i, Playfair::getBytes(key[i]));
 
-		if (std::isalnum() && !std::isdigit()) { // FIX THIS WHEN THE FUNCTION TO GET THE CHAR'S BYTES IS COMPLETED
+		upperKey += actualCharacter;
+		i += Playfair::getBytes(key[i]) - 1;
+		/*if (std::isalnum() && !std::isdigit()) { // FIX THIS WHEN THE FUNCTION TO GET THE CHAR'S BYTES IS COMPLETED
 			std::transform(actualCharacter.begin(), actualCharacter.end(), actualCharacter.begin(), std::toupper);
 			upperKey += actualCharacter;
 		}
 		else { // if actualCharater is a symbol
 			upperKey += actualCharacter;
-		}
+		}*/
 	}
 
 	for (size_t i = 0; i < upperKey.length(); i++) {
