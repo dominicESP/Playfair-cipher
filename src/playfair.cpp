@@ -38,7 +38,7 @@ std::size_t Playfair::getBytes(const unsigned char charByte) {
 }
 
 void Playfair::generateMatrix(const std::string& key) {
-	std::string updatedAlphabet;
+	std::vector<std::string> updatedAlphabet;
 	std::string upperKey;
 	std::string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789¡!\",.;:¿?'%# ";
 	int letterIndex = 0;
@@ -58,27 +58,34 @@ void Playfair::generateMatrix(const std::string& key) {
 	}
 
 	for (size_t i = 0; i < upperKey.length(); i++) {
-		auto it = std::find(updatedAlphabet.begin(), updatedAlphabet.end(), upperKey[i]);
+		std::string keyToAlphabet = upperKey.substr(i, Playfair::getBytes(upperKey[i]));
+
+		auto it = std::find(updatedAlphabet.begin(), updatedAlphabet.end(), keyToAlphabet);
 
 		if (it == updatedAlphabet.end()) { // if the letter is not found in the updatedAlphabet, add it
-			updatedAlphabet.push_back(upperKey[i]); // changes the key if the letters are repeated. hello -> helo
+			updatedAlphabet.push_back(keyToAlphabet);
 		}
+
+		i += Playfair::getBytes(upperKey[i]) - 1;
 	}
 	
 	for (size_t letter = 0; letter < alphabet.length(); ++letter) {
-		if (std::find(updatedAlphabet.begin(), updatedAlphabet.end(), alphabet[letter]) == updatedAlphabet.end()) {
-			updatedAlphabet += alphabet[letter]; // generates a new alphabet with the key letters first and then the rest of the alphabet
+		std::string letterNotInAlphabet = alphabet.substr(letter, Playfair::getBytes(alphabet[letter]));
+
+		if (std::find(updatedAlphabet.begin(), updatedAlphabet.end(), letterNotInAlphabet) == updatedAlphabet.end()) {
+			updatedAlphabet.push_back(letterNotInAlphabet); // generates a new alphabet with the key letters first and then the rest of the alphabet
 		}
+
+		letter += Playfair::getBytes(alphabet[letter]) - 1;
 	}
 
 	for (size_t row = 0; row < MATRIX_SIZE; row++) {
 		for (size_t column = 0; column < MATRIX_SIZE; column++) {
 			matrix[row][column] = updatedAlphabet[letterIndex];
+			std::cout << matrix[row][column];
 			letterIndex++;
 		}
 	}
-
-	std::cout << updatedAlphabet << std::endl;
 }
 
 PreparedText Playfair::prepareText(const std::string& text) {
@@ -88,14 +95,20 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	std::string pair;
 
 	for (size_t i = 0; i < text.length(); ++i) { // verify valid characters
-		auto it = std::find(symbolsList.begin(), symbolsList.end(), text[i]);
+		std::string thisCharacter = text.substr(i, Playfair::getBytes(text[i]));
+		auto it = std::find(symbolsList.begin(), symbolsList.end(), thisCharacter);
 
-		if (std::isalnum(static_cast<unsigned char>(text[i])) || std::isspace(static_cast<unsigned char>(text[i])) || it != symbolsList.end()) {
-			cleanText.push_back(text[i]);
+		if (std::all_of(thisCharacter.begin(), thisCharacter.end(), [](unsigned char c) { return std::isalnum(c); })
+			|| std::all_of(thisCharacter.begin(), thisCharacter.end(), [](unsigned char c) { return std::isspace(c); })
+			|| it != symbolsList.end())
+		{
+			cleanText += thisCharacter;
 		}
 		else {
 			throw std::invalid_argument("The text contains invalid characters.");
 		}
+
+		i += Playfair::getBytes(text[i]);
 	}
 
 	if (cleanText.empty()) {

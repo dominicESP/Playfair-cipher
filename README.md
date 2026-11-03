@@ -6,8 +6,8 @@ A C++ implementation of the classical Playfair cipher with encryption, decryptio
 
 ## Requirements
 
-- C++17 or newer
-- Visual Studio 2026 (or any C++17 compatible compiler)
+- C++20 or newer
+- Visual Studio 2026 (or any C++20 compatible compiler)
 
 ---
 

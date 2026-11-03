@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <cstddef>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 
 struct Position {
 	int row;
