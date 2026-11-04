@@ -46,15 +46,19 @@ void Playfair::generateMatrix(const std::string& key) {
 	for (size_t i = 0; i < key.length(); ++i) {
 		std::string actualCharacter = key.substr(i, Playfair::getBytes(key[i]));
 
-		upperKey += actualCharacter;
-		i += Playfair::getBytes(key[i]) - 1;
-		/*if (std::isalnum() && !std::isdigit()) { // FIX THIS WHEN THE FUNCTION TO GET THE CHAR'S BYTES IS COMPLETED
+		int32_t j = 0;
+		UChar cp;
+
+		U8_NEXT(actualCharacter.c_str(), j, (int32_t)actualCharacter.size(), cp);
+		if (u_isalnum(cp) && !u_isdigit(cp)) { // just letters
 			std::transform(actualCharacter.begin(), actualCharacter.end(), actualCharacter.begin(), std::toupper);
 			upperKey += actualCharacter;
 		}
 		else { // if actualCharater is a symbol
 			upperKey += actualCharacter;
-		}*/
+		}
+
+		i += Playfair::getBytes(key[i]) - 1;
 	}
 
 	for (size_t i = 0; i < upperKey.length(); i++) {
@@ -88,7 +92,7 @@ void Playfair::generateMatrix(const std::string& key) {
 	}
 }
 
-PreparedText Playfair::prepareText(const std::string& text) {
+PreparedText Playfair::prepareText(const std::string& text) { //FIX SOME ERRORS IN THIS FUNCTION
 	PreparedText preparedText;
 
 	std::string cleanText;
@@ -97,10 +101,11 @@ PreparedText Playfair::prepareText(const std::string& text) {
 	for (size_t i = 0; i < text.length(); ++i) { // verify valid characters
 		std::string thisCharacter = text.substr(i, Playfair::getBytes(text[i]));
 		auto it = std::find(symbolsList.begin(), symbolsList.end(), thisCharacter);
-
-		if (std::all_of(thisCharacter.begin(), thisCharacter.end(), [](unsigned char c) { return std::isalnum(c); })
-			|| std::all_of(thisCharacter.begin(), thisCharacter.end(), [](unsigned char c) { return std::isspace(c); })
-			|| it != symbolsList.end())
+		
+		int32_t j = 0;
+		UChar cp;
+		U8_NEXT(thisCharacter.c_str(), j, (int32_t)thisCharacter.size(), cp);
+		if (u_isalnum(cp) || u_isdigit(cp) || it != symbolsList.end())
 		{
 			cleanText += thisCharacter;
 		}
@@ -108,7 +113,7 @@ PreparedText Playfair::prepareText(const std::string& text) {
 			throw std::invalid_argument("The text contains invalid characters.");
 		}
 
-		i += Playfair::getBytes(text[i]);
+		i += Playfair::getBytes(text[i]) - 1;
 	}
 
 	if (cleanText.empty()) {
@@ -117,32 +122,37 @@ PreparedText Playfair::prepareText(const std::string& text) {
 
 	std::transform(cleanText.begin(), cleanText.end(), cleanText.begin(), std::toupper);
 	
-	size_t i = 0;
-	while (i < cleanText.length()) {
+	while (!cleanText.empty()) {
 		size_t xPosition = preparedText.pairs.size() * 2 + 1; // calculates the position of the 'X' at the end of the pair, which is always at an odd index
-		if (i == cleanText.length() - 1) {
-			pair.push_back(cleanText[i]);
+		std::string cleanTextCharacter = cleanText.substr(0, Playfair::getBytes(cleanText[0]));
+		
+		if (0 == cleanText.length() - 1) {
+			pair += cleanTextCharacter;
 			pair.push_back('X');
-			
+			cleanText.erase(0, Playfair::getBytes(cleanText[0]));
+
 			preparedText.paddingPositions.push_back(xPosition);
 			preparedText.pairs.push_back(pair);
 			break;
 		}
 		else {
-			if (cleanText[i] == cleanText[i + 1]) {
-				pair.push_back(cleanText[i]);
+			if (cleanTextCharacter == cleanText.substr(Playfair::getBytes(cleanText[0]),
+				Playfair::getBytes(cleanText[Playfair::getBytes(cleanText[0])]))) { // the second parameter gets the bytes of the actual character
+				//and then counts the bytes of the next character starting from its position
+				pair += cleanTextCharacter;
 				pair.push_back('X');
+				cleanText.erase(0, Playfair::getBytes(cleanText[0]));
 				
 				preparedText.paddingPositions.push_back(xPosition);
 				preparedText.pairs.push_back(pair);
-				i++;
 			}
 			else {
-				pair.push_back(cleanText[i]);
-				pair.push_back(cleanText[i + 1]);
+				pair += cleanTextCharacter;
+				pair += cleanText.substr(Playfair::getBytes(cleanText[0]), Playfair::getBytes(cleanText[Playfair::getBytes(cleanText[0])]));
+				cleanText.erase(0, Playfair::getBytes(cleanText[0]));
+				cleanText.erase(0, Playfair::getBytes(cleanText[0]));
 
 				preparedText.pairs.push_back(pair);
-				i += 2;
 			}
 		}
 		pair.clear();
@@ -216,9 +226,11 @@ EncryptionResult Playfair::deserialize(const std::string& inputText) {
 			throw std::invalid_argument("Invalid Playfair message format.");
 		}
 
-		for (char c : encryptedText)
+		for (size_t i = 0; i < encryptedText.length(); ++i)
 		{
-			if (!std::isalnum(static_cast<unsigned char>(c)))
+			std::string s = encryptedText.substr(0, Playfair::getBytes(encryptedText[i]));
+
+			if () //PENDENT OF COMPLETING
 			{
 				throw std::invalid_argument("Invalid Playfair message format.");
 			}

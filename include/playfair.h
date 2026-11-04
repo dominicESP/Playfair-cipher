@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <unicode/uchar.h>
 #include <unicode/ustring.h>
+#include <unicode/utf.h>
 
 struct Position {
 	int row;
